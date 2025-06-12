@@ -1,40 +1,53 @@
-const express = require('express');
-const cors = require('cors');
-const { Pool } = require('pg');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const { Pool } = require("pg");
+require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 10000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// PostgreSQL connection
+// PostgreSQL pool setup
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // Required for Render PostgreSQL SSL
+    rejectUnauthorized: false, // Needed for Render
   },
 });
 
-// Routes
-app.get('/api/houses', async (req, res) => {
+// Route to get all houses
+app.get("/api/houses", async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM houses ORDER BY id DESC');
+    const result = await pool.query("SELECT * FROM houses ORDER BY id DESC");
     res.json(result.rows);
-  } catch (err) {
-    console.error('Error fetching houses:', err);
-    res.status(500).send('Server error');
+  } catch (error) {
+    console.error("Error fetching houses:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-// Root route (optional health check)
-app.get('/', (req, res) => {
-  res.send('House Rental App Backend is running');
+// ✅ Route to add a new house
+app.post("/api/houses", async (req, res) => {
+  const { title, location, price, image_url } = req.body;
+
+  if (!title || !location || !price) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO houses (title, location, price, image_url) VALUES ($1, $2, $3, $4) RETURNING *",
+      [title, location, price, image_url]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error adding house:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
