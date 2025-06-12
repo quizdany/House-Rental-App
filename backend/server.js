@@ -1,28 +1,40 @@
 const express = require('express');
 const cors = require('cors');
+const { Pool } = require('pg');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Middleware
 app.use(cors());
+app.use(express.json());
 
-// Example static house data
-const houses = [
-  { id: 1, title: 'Modern Apartment in Kigali', price: 400 },
-  { id: 2, title: 'Spacious House in Kacyiru', price: 800 },
-  { id: 3, title: 'Budget Room in Nyamirambo', price: 150 },
-];
+// PostgreSQL connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // Required for Render PostgreSQL SSL
+  },
+});
 
-// Root route (optional)
+// Routes
+app.get('/api/houses', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM houses ORDER BY id DESC');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching houses:', err);
+    res.status(500).send('Server error');
+  }
+});
+
+// Root route (optional health check)
 app.get('/', (req, res) => {
-  res.send('🏠 House Rental API is running!');
+  res.send('House Rental App Backend is running');
 });
 
-// Main API route
-app.get('/api/houses', (req, res) => {
-  res.json(houses);
-});
-
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
