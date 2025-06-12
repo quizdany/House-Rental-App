@@ -4,7 +4,7 @@ function App() {
   const [houses, setHouses] = useState([]);
 
   useEffect(() => {
-    fetch('https://house-rental-backend.onrender.com/api/houses') // Replace with your actual backend Render URL
+    fetch('https://house-rental-app-backend.onrender.com/api/houses') // Replace with your actual backend Render URL
       .then((res) => res.json())
       .then((data) => setHouses(data))
       .catch((err) => console.error('Failed to fetch houses:', err));
