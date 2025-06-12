@@ -2,22 +2,27 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 
-// Dummy house data
+// Example static house data
 const houses = [
-  { id: 1, title: 'Modern 2BR Apartment in Kigali', price: 300 },
-  { id: 2, title: 'Cozy Studio in Nyamirambo', price: 150 },
-  { id: 3, title: '4BR Villa with Garden - Kacyiru', price: 700 }
+  { id: 1, title: 'Modern Apartment in Kigali', price: 400 },
+  { id: 2, title: 'Spacious House in Kacyiru', price: 800 },
+  { id: 3, title: 'Budget Room in Nyamirambo', price: 150 },
 ];
 
-// API route
+// Root route (optional)
+app.get('/', (req, res) => {
+  res.send('🏠 House Rental API is running!');
+});
+
+// Main API route
 app.get('/api/houses', (req, res) => {
   res.json(houses);
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
