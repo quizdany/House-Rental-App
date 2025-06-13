@@ -11,7 +11,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://yourusername:yourpassword@localhost:5432/homerent'
+  connectionString: process.env.DATABASE_URL || 'postgresql://house_rental_db_c684_user:HwRmgr3EpVQJvBVfW6RkuAfvpZgnfF3l@dpg-d15koeumcj7s73br6qeg-a.oregon-postgres.render.com/house_rental_db_c684'
 });
 
 // === Routes ===
